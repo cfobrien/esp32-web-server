@@ -86,7 +86,7 @@ void app_main(void)
 
 
     static char buf[MAX_RESPONSE_LEN] = {0};
-    ESP_ERROR_CHECK(make_get_request(buf, "https://httpbin.org/get"));
+    ESP_ERROR_CHECK(make_get_request(buf, "2020-04-01"));
     printf("%s\n", buf);
 
 

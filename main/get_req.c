@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "get_req.h"
 #include <string.h>
+#include "api_key.h" // #define API_KEY myapikey
 
 static const char *TAG = "http client";
 
@@ -75,17 +76,20 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 }
 
 // initialize GET request params and http client, perform transfer, cleanup then return response
-esp_err_t make_get_request(char * const resp_buf, const char * url)
+esp_err_t make_get_request(char * const resp_buf, const char * date)
 {
 	char local_response_buf[MAX_RESPONSE_LEN];
 
 	esp_http_client_config_t config = {
-		.url = url,
+		.url = "https://covid-19-data.p.rapidapi.com/report/country/all",
+		.query = "code=it&date=2020-04-01",
 		.event_handler = _http_event_handler,
 		.user_data = local_response_buf
 	};
 	esp_http_client_handle_t client = esp_http_client_init(&config);
-	esp_err_t err = esp_http_client_perform(client);
+	esp_err_t err = esp_http_client_set_header(client, "x-rapidapi-host", "covid-19-data.p.rapidapi.com");
+	err = esp_http_client_set_header(client, "x-rapidapi-key", API_KEY);
+	err = esp_http_client_perform(client);
 
 	if (err == ESP_OK) {
 	ESP_LOGI(TAG, "Status = %d, content_length = %d",
