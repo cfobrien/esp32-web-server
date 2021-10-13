@@ -28,6 +28,8 @@
 #include "write_file.h"
 
 static const char *TAG = "web app";
+static char filename_template[] = "/spiffs/NA.txt";
+static char line_template[] = "Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)";
 
 /* This example demonstrates how to create file server
  * using esp_http_server. This file has only startup code.
@@ -78,15 +80,21 @@ typedef struct {
     const char * date;
 } api_params_t;
 
+
 static void get_and_write_api_response(void *pvParameters)
 {
-    // api_params_t * p_params = (api_params_t *)pvParameters;
-    // upload_file(
-    //     strcat(p_params->isocode, ".txt"),
-    //     p_params->date);
-    write_line("/spiffs/filename.txt","contents");
+    api_params_t * p_params = (api_params_t *)pvParameters;
+
+    // overwrite previous country code
+    filename_template[8] = p_params->isocode[0];
+    filename_template[9] = p_params->isocode[1];
+
+    
+
+    write_line(filename_template, line_template);
     vTaskDelete(NULL);
 }
+
 
 void app_main(void)
 {
@@ -103,7 +111,7 @@ void app_main(void)
         .isocode = "it",
         .date = "2020-04-01"
     };
-    xTaskCreate(&get_and_write_api_response, "get_and_write_api_response", 4096, &api_params, 5, NULL);
+    xTaskCreate(&get_and_write_api_response, "get_and_write_api_response", 8192, &api_params, 5, NULL);
 
     // const char * isocode = "it";
     // static char buf[MAX_RESPONSE_LEN] = {0};
