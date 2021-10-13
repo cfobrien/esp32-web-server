@@ -26,8 +26,18 @@
 
 #include "get_req.h"
 #include "write_file.h"
+#include <time.h>
+#include <sys/time.h>
 
 #define REPLACE_AT(rdst, doff, rsrc, roff, rlen) for (int ri = 0; ri < rlen; ri++) rdst[doff+ri] = rsrc[roff+ri]
+
+
+static char filename_template[] = "/spiffs/NA.txt";
+static char line_template[] = "Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)\n";
+static char query_template[] = "code=XX&date=YYYY-MM-DD";
+
+#define MAX_RESPONSE_LEN 1024
+static char response_buf[MAX_RESPONSE_LEN] = {0};
 
 static const char *TAG = "web app";
 
@@ -119,11 +129,28 @@ void app_main(void)
     /* Initialize file storage */
     ESP_ERROR_CHECK(init_spiffs());
 
-    static api_params_t api_params = {
-        .isocode = "it",
-        .date = "2020-04-01"
-    };
-    xTaskCreate(&get_and_write_api_response, "get_and_write_api_response", 8192, &api_params, 5, NULL);
+    // TODO: date time stuff
+    // time_t now;
+    // struct tm timeinfo;
+    // time(&now);
+    // char strftime_buf[64];
+    // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+    // printf("%s\n", strftime_buf);
+
+    static api_params_t api_params = {0};
+    do
+    {
+        // set date and iso code for api call
+        api_params.isocode = "it";
+        api_params.date = "2020-04-02";
+
+        xTaskCreate(&get_and_write_api_response, "get_and_write_api_response", 8192, &api_params, 5, NULL);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+    }
+    while(strcmp("2020-04-01", api_params.date));
+
+    // xTaskCreate(&get_and_write_api_response, "get_and_write_api_response", 8192, &api_params, 5, NULL);
 
     /* Start the file server */
     ESP_ERROR_CHECK(start_file_server("/spiffs"));
