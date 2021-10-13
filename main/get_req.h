@@ -11,6 +11,6 @@
 
 esp_err_t _http_event_handler(esp_http_client_event_t * evt);
 
-esp_err_t make_get_request(char * const resp_buf, const char * url);
+esp_err_t make_get_request(char * const resp_buf, const char * isocode);
 
 #endif // GET_REQ_H

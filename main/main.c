@@ -25,6 +25,7 @@
 #include "esp_tls.h"
 
 #include "get_req.h"
+#include "write_file.h"
 
 static const char *TAG = "web app";
 
@@ -72,26 +73,42 @@ static esp_err_t init_spiffs(void)
  * file_server.c */
 esp_err_t start_file_server(const char *base_path);
 
+typedef struct {
+    char * isocode;
+    const char * date;
+} api_params_t;
+
+static void get_and_write_api_response(void *pvParameters)
+{
+    // api_params_t * p_params = (api_params_t *)pvParameters;
+    // upload_file(
+    //     strcat(p_params->isocode, ".txt"),
+    //     p_params->date);
+    write_line("/spiffs/filename.txt","contents");
+    vTaskDelete(NULL);
+}
+
 void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
     ESP_ERROR_CHECK(example_connect());
-
-
-    static char buf[MAX_RESPONSE_LEN] = {0};
-    ESP_ERROR_CHECK(make_get_request(buf, "2020-04-01"));
-    printf("%s\n", buf);
-
 
     /* Initialize file storage */
     ESP_ERROR_CHECK(init_spiffs());
+
+    static api_params_t api_params = {
+        .isocode = "it",
+        .date = "2020-04-01"
+    };
+    xTaskCreate(&get_and_write_api_response, "get_and_write_api_response", 4096, &api_params, 5, NULL);
+
+    // const char * isocode = "it";
+    // static char buf[MAX_RESPONSE_LEN] = {0};
+    // ESP_ERROR_CHECK(make_get_request(buf, isocode));
+    // printf("%s\n", buf);
 
     /* Start the file server */
     ESP_ERROR_CHECK(start_file_server("/spiffs"));
