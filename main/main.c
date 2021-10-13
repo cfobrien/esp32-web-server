@@ -31,7 +31,7 @@
 
 static const char *TAG = "web app";
 static char filename_template[] = "/spiffs/NA.txt";
-static char line_template[] = "Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)";
+static char line_template[] = "Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)\n";
 
 /* This example demonstrates how to create file server
  * using esp_http_server. This file has only startup code.
@@ -90,7 +90,12 @@ static void get_and_write_api_response(void *pvParameters)
     // overwrite previous country code
     REPLACE_AT(filename_template, 8, p_params->isocode, 0, 2);
 
-
+    // overwrite previous date with following format
+    //"Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)\n";
+    //"2020-04-01"
+    REPLACE_AT(line_template, 5, p_params->date, 8, 2);
+    REPLACE_AT(line_template, 8, p_params->date, 5, 2);
+    REPLACE_AT(line_template, 11, p_params->date, 0, 4);
 
     write_line(filename_template, line_template);
     vTaskDelete(NULL);
