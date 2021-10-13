@@ -86,10 +86,11 @@ static void get_and_write_api_response(void *pvParameters)
     api_params_t * p_params = (api_params_t *)pvParameters;
 
     // overwrite previous country code
-    filename_template[8] = p_params->isocode[0];
-    filename_template[9] = p_params->isocode[1];
+    // filename_template[8] = p_params->isocode[0];
+    // filename_template[9] = p_params->isocode[1];
+    strcpy(filename_template+8, p_params->isocode);
 
-    
+
 
     write_line(filename_template, line_template);
     vTaskDelete(NULL);
