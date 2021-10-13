@@ -30,8 +30,6 @@
 #define REPLACE_AT(rdst, doff, rsrc, roff, rlen) for (int ri = 0; ri < rlen; ri++) rdst[doff+ri] = rsrc[roff+ri]
 
 static const char *TAG = "web app";
-static char filename_template[] = "/spiffs/NA.txt";
-static char line_template[] = "Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)\n";
 
 /* This example demonstrates how to create file server
  * using esp_http_server. This file has only startup code.
@@ -87,12 +85,20 @@ static void get_and_write_api_response(void *pvParameters)
 {
     api_params_t * p_params = (api_params_t *)pvParameters;
 
+    // overwrite query template
+    // "code=XX&date=YYYY-MM-DD"
+    REPLACE_AT(query_template, 5, p_params->isocode, 0, 2);
+    REPLACE_AT(query_template, 13, p_params->date, 0, 10);
+
+    make_get_request(response_buf, query_template);
+    printf("%s\n", response_buf);
+
     // overwrite previous country code
     REPLACE_AT(filename_template, 8, p_params->isocode, 0, 2);
 
     // overwrite previous date with following format
-    //"Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)\n";
-    //"2020-04-01"
+    // "Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)\n";
+    // "2020-04-01"
     REPLACE_AT(line_template, 5, p_params->date, 8, 2);
     REPLACE_AT(line_template, 8, p_params->date, 5, 2);
     REPLACE_AT(line_template, 11, p_params->date, 0, 4);
@@ -118,11 +124,6 @@ void app_main(void)
         .date = "2020-04-01"
     };
     xTaskCreate(&get_and_write_api_response, "get_and_write_api_response", 8192, &api_params, 5, NULL);
-
-    // const char * isocode = "it";
-    // static char buf[MAX_RESPONSE_LEN] = {0};
-    // ESP_ERROR_CHECK(make_get_request(buf, isocode));
-    // printf("%s\n", buf);
 
     /* Start the file server */
     ESP_ERROR_CHECK(start_file_server("/spiffs"));

@@ -76,13 +76,13 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 }
 
 // initialize GET request params and http client, perform transfer, cleanup then return response
-esp_err_t make_get_request(char * const resp_buf, const char * date)
+esp_err_t make_get_request(char * const resp_buf, const char * query)
 {
 	char local_response_buf[MAX_RESPONSE_LEN];
 
 	esp_http_client_config_t config = {
 		.url = "https://covid-19-data.p.rapidapi.com/report/country/all",
-		.query = "code=it&date=2020-04-01",
+		.query = query,
 		.event_handler = _http_event_handler,
 		.user_data = local_response_buf
 	};
@@ -97,7 +97,7 @@ esp_err_t make_get_request(char * const resp_buf, const char * date)
 			esp_http_client_get_content_length(client));
 	}
 	ESP_LOG_BUFFER_HEX(TAG, local_response_buf, MAX_RESPONSE_LEN);
-	// printf(local_response_buf);
+    local_response_buf[esp_http_client_get_content_length(client)] = '\0'; // terminate request string
 	strcpy(resp_buf, local_response_buf);
 
 	esp_http_client_cleanup(client);
