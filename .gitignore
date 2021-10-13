@@ -1,1 +1,15 @@
 main/api_key.h
+build/.bin_timestamp
+build/.ninja_deps
+build/.ninja_log
+build/build.ninja
+build/compile_commands.json
+build/esp32-web-server.bin
+build/esp32-web-server.elf
+build/esp32-web-server.map
+build/CMakeFiles/git-data/head-ref
+build/esp-idf/app_update/libapp_update.a
+build/esp-idf/app_update/CMakeFiles/__idf_app_update.dir/esp_app_desc.c.obj
+build/esp-idf/esp32/ld/esp32.project.ld
+build/esp-idf/main/libmain.a
+build/esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj

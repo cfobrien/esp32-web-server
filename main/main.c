@@ -27,6 +27,8 @@
 #include "get_req.h"
 #include "write_file.h"
 
+#define REPLACE_AT(rdst, doff, rsrc, roff, rlen) for (int ri = 0; ri < rlen; ri++) rdst[doff+ri] = rsrc[roff+ri]
+
 static const char *TAG = "web app";
 static char filename_template[] = "/spiffs/NA.txt";
 static char line_template[] = "Date(DD/MM/YYYY) Daily deaths:(XXXX) Total deaths:(XXXX)";
@@ -86,9 +88,7 @@ static void get_and_write_api_response(void *pvParameters)
     api_params_t * p_params = (api_params_t *)pvParameters;
 
     // overwrite previous country code
-    // filename_template[8] = p_params->isocode[0];
-    // filename_template[9] = p_params->isocode[1];
-    strcpy(filename_template+8, p_params->isocode);
+    REPLACE_AT(filename_template, 8, p_params->isocode, 0, 2);
 
 
 
